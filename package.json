@@ -1,0 +1,27 @@
+{
+  "name": "massage-spa",
+  "version": "1.0.0",
+  "description": "A single page message board",
+  "main": "index.js",
+  "dependencies": {
+    "underscore": "^1.8.3",
+    "jquery": "^3.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wikonator/SPA-Board.git"
+  },
+  "keywords": [
+    "spa"
+  ],
+  "author": "Wiki",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Wikonator/SPA-Board/issues"
+  },
+  "homepage": "https://github.com/Wikonator/SPA-Board#readme"
+}
