@@ -21,18 +21,21 @@
  <body>
      <div id="main"> </div>
 
-     <script id="handles" type="templateof/handlebars">  </script>
-
      <script id="falls" type="text/handlebars">
-     <form action="/login" id="login-form">
-     <h3> Login time! </h3> <br>
+         <form action="/user" id="login-form" method="post">
+         <h3> Login time! </h3> <br>
 
-     Username: <br>
-     <input type="text" name="usename"> <br>
-     Password: <br>
-     <input type="text" name="pass"><br>
-     <button id="login"> Go! </button>
-     </form>
+         Username: <br>
+         <input type="text" id="usename"> <br>
+         Password: <br>
+         <input type="text" id="pass"><br>
+         <button type="button" id="submitButton" name="submitButton"> Go! </button>
+         </form>
+     </script>
+
+     <script id="homePage" type="text/handlebars">
+        <h3> Ahoy!</h3>
+        <p> Welcome to Frank a website for SWIM</p>
      </script>
 
      <script src="index.js"> </script>
