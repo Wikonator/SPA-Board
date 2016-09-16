@@ -23,8 +23,10 @@
 
      <script id="falls" type="text/handlebars">
          <form action="/user" id="login-form" method="post">
-         <h3> Login time! </h3> <br>
+         <h3> Registration time! </h3> <br>
 
+         Email:<br>
+         <input type="email" id="email"> <br>
          Username: <br>
          <input type="text" id="usename"> <br>
          Password: <br>
@@ -38,6 +40,16 @@
         <p> Welcome to Frank a website for SWIM</p>
      </script>
 
+     <script id="login" type="text/handlebars">
+        <form action="/login" id="logger" method="post">
+        <h3> Login time! </h3> <br>
+        Username: <br>
+        <input type="text" id="usename"> <br>
+        Password: <br>
+        <input type="text" id="pass"> <br>
+        <button type="button" id="goButton" name="submitButt"> Go! </button>
+        </form>
+    </script>
      <script src="index.js"> </script>
 
  </body>

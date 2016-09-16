@@ -23,18 +23,18 @@
         url: "/homepage"
     });
 
+    var LoginModel = Backbone.Model.extend({
+        initialize: function(){
 
+        },
 
-
-
-// window.location.hash = "registration";
-
-
+        url: "/login"
+    });
 
      var HomePageView = Backbone.View.extend({
          initialize: function () {
              this.render();
-             console.log("ding dong");
+            //  console.log("ding dong");
          },
          render: function () {
              this.$el.html(Handlebars.templates.homePage())
@@ -48,25 +48,54 @@
         },
         render: function() {
             this.$el.html(Handlebars.templates.falls());
-
         },
-        events: {"click #submitButton": "saveThis"
+        events: {
+            "click #submitButton": "saveThisAndGo"
         },
-        saveThis: function() {
-        //
+        saveThisAndGo: function() {
+            console.log("I was clicked!");
             this.model.save({
+                "email" : $('#email').val(),
                 "usename": $('#usename').val(),
                 "pass" : $('#pass').val()
+            },
+            {
+                error: function(){
+                    console.log("error");
+                },
+                success: function() {
+                    console.log("success");
+                    window.location.hash = "homepage";
+                }
             });
         },
         el: "#main",
-    })
+    });
 
+    var loginView = Backbone.View.extend({
+        initialize: function() {
+            this.render();
+        },
+        render: function() {
+            this.$el.html(Handlebars.templates.login());
+        },
+        events: {
+            "click #goButton": "checkThisAndGo"
+        },
+        checkThisAndGo: function() {
+            this.model.save({
+                "usename": $("#usename").val(),
+                "pass": $("#pass").val()
+            })
+        },
+        el: "#main"
+    });
 
     var Router = Backbone.Router.extend({
         routes: {
             "homepage" : "homepage",
-            "registration" : "register"
+            "registration" : "register",
+            "login" : "login"
         },
         register : function() {
             var regModel = new RegistrationModel();
@@ -78,6 +107,12 @@
             var homeModel = new HomePageModel();
             new HomePageView({
                 model: homeModel
+            });
+        },
+        login : function() {
+            var loginModel = new LoginModel();
+            new loginView({
+                model: loginModel
             });
         }
     });
