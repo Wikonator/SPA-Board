@@ -1,6 +1,7 @@
 var express = require("express"),
     bodyParser = require("body-parser"),
     app = express(),
+    crypt = require("bcrypt"),
     pg = require("pg");
 
 app.use(express.static(__dirname + "/Static"));
@@ -10,7 +11,7 @@ app.get("/frank", function (req, res) {
     res.sendFile(__dirname + "/Static/index.html");
 });
 
-function addUser(mail, user, password, res, req) {
+function addUser(mail, user, password, res) {
     var client = new pg.Client("postgres://spiced:spiced1@localhost:5432/Frank");
     client.connect(function (err) {
         if (err) {
@@ -34,21 +35,38 @@ function addUser(mail, user, password, res, req) {
 
 }
 
+function hashPass(user, res) {
+    crypt.genSalt(function(err,salt) {
+        if (err) {
+            return err;
+        }
+        console.log(salt);
+        crypt.hash(user.pass, salt, function(err, hash) {
+            if (err) {
+                return err;
+            }
+            console.log(hash);
+            addUser(user.email, user.name, hash, res);
+        });
+    });
+};
+
 app.post("/register", function(req, res) {
     var user = {
         email: req.body.email,
         name: req.body.usename,
         pass: req.body.pass
     };
+    hashPass(user, res);
     console.log(user);
-    addUser(user.email, user.name, user.pass, res, req);
+
 });
 
 app.get("/homepage", function(req, res) {
     console.log(req.body);
 });
 
-function checkThisPassOut(req, res, usename, pass) {
+function checkThisPassOut(req, res, usename, plainPass) {
     var client = new pg.Client("postgres://spiced:spiced1@localhost:5432/Frank");
     client.connect(function(error) {
         if (error) {
@@ -59,12 +77,24 @@ function checkThisPassOut(req, res, usename, pass) {
         client.query(input, [usename], function(error, results){
             if (error) {
                 console.log(error);
+                res.json("query failed")
             }
-            var pass = results.rows[0];
-            console.log(pass);
-
-            res.json("alldone!");
-
+            var hashedPass = results.rows[0];
+            client.end();
+            console.log(hashedPass);
+            function comparePasses(plainPass, hashedPass, res) {
+                // console.log("comparing passwords");
+                crypt.compare(plainPass, hashedPass, function(err, doesMatch) {
+                    if (err) {
+                        console.log(err);
+                        return res.json({
+                            error: "not habenning"
+                        });
+                    }
+                    res.json("good to go");
+                })
+            }
+            comparePasses(plainPass, hashedPass.password, res);
         });
     });
 };
