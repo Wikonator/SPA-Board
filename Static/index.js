@@ -31,6 +31,14 @@
         url: "/login"
     });
 
+    var LogoutModel = Backbone.Model.extend({
+        initialize: function(){
+
+        },
+
+        url: "/logout"
+    });
+
      var HomePageView = Backbone.View.extend({
          initialize: function () {
              this.render();
@@ -38,6 +46,13 @@
          },
          render: function () {
              this.$el.html(Handlebars.templates.homePage())
+         },
+         events: {
+             "click #logoutButton": "goLogout"
+         },
+         goLogout: function () {
+             console.log("loggin out");
+             window.location.hash = "logout";
          },
          el: "#main",
      });
@@ -91,11 +106,22 @@
         el: "#main"
     });
 
+    var logoutView = Backbone.View.extend({
+        initialize: function() {
+            this.render();
+        },
+        render: function () {
+            this.$el.html(Handlebars.templates.logout());
+        },
+        el: "#main"
+    });
+
     var Router = Backbone.Router.extend({
         routes: {
             "homepage" : "homepage",
             "registration" : "register",
-            "login" : "login"
+            "login" : "login",
+            "logout" : "logout"
         },
         register : function() {
             var regModel = new RegistrationModel();
@@ -113,6 +139,12 @@
             var loginModel = new LoginModel();
             new loginView({
                 model: loginModel
+            });
+        },
+        logout : function() {
+            var logoutModel = new LogoutModel();
+            new logoutView({
+                model: logoutModel
             });
         }
     });

@@ -2,10 +2,37 @@ var express = require("express"),
     bodyParser = require("body-parser"),
     app = express(),
     crypt = require("bcrypt"),
+    redis = require("redis"),
+    cache = redis.createClient({
+        host: "localhost",
+        port: 6379
+    }),
+    session = require('express-session'),
+    Store = require('connect-redis')(session),
+    csurf = require("csurf"),
     pg = require("pg");
 
 app.use(express.static(__dirname + "/Static"));
 app.use(bodyParser.json());
+app.use(session({
+    store: new Store({
+        ttl: 3000,
+        host: 'localhost',
+        port: 6379
+    }),
+    resave: false,
+    saveUninitialized: true,
+    secret: "XSM0018hubris765"
+}));
+app.use(function (req, res, next) {
+    if (req.session.usename === undefined) {
+        return res.json({
+
+        })
+    }
+    next();
+})
+
 
 app.get("/frank", function (req, res) {
     res.sendFile(__dirname + "/Static/index.html");
@@ -27,6 +54,7 @@ function addUser(mail, user, password, res) {
                 return res.json(error);
             }
             var id = results.rows[0].id;
+            req.session.usename = user;
             console.log(id);
             res.json("query complete");
         })
@@ -34,6 +62,7 @@ function addUser(mail, user, password, res) {
     })
 
 }
+
 
 function hashPass(user, res) {
     crypt.genSalt(function(err,salt) {
@@ -59,7 +88,6 @@ app.post("/register", function(req, res) {
     };
     hashPass(user, res);
     console.log(user);
-
 });
 
 app.get("/homepage", function(req, res) {
@@ -92,6 +120,8 @@ function checkThisPassOut(req, res, usename, plainPass) {
                         });
                     }
                     res.json("good to go");
+                    req.session.username = usename;
+                    console.log(req.session.usename);
                 })
             }
             comparePasses(plainPass, hashedPass.password, res);
@@ -106,6 +136,16 @@ app.post("/login", function(req, res) {
     };
     console.log(user);
     checkThisPassOut(req, res, user.name, user.pass);
+});
+
+app.post("/logout", function(req, res) {
+    req.session.destroy(function(err) {
+        if (err) {
+            console.log(err);
+        }
+            console.log("session destroyed, returning to base" + req.session.usename);
+            res.json("session whacked")
+    });
 });
 
 app.listen(9001);
