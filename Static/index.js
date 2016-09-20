@@ -1,4 +1,5 @@
 (function(){
+    var isLoggedIn;
     var templates = document.querySelectorAll('script[type="text/handlebars"]');
 
     Handlebars.templates = Handlebars.templates || {};
@@ -6,6 +7,7 @@
     Array.prototype.slice.call(templates).forEach(function(script){
         Handlebars.templates[script.id] = Handlebars.compile(script.innerHTML);
     })
+
 
     var RegistrationModel = Backbone.Model.extend({
         initialize: function() {
@@ -17,7 +19,7 @@
 
     var HomePageModel = Backbone.Model.extend({
         initialize: function(){
-
+            console.log("yo i got intialized");
         },
 
         url: "/homepage"
@@ -92,7 +94,15 @@
             this.render();
         },
         render: function() {
-            this.$el.html(Handlebars.templates.login());
+            console.log(window.location.search);
+            if (window.location.search === "?notloggedin=true") {
+            var displayWarning = true;
+            } else {
+                var displayWarning = false;
+            }
+                this.$el.html(Handlebars.templates.login({
+                    warning: displayWarning
+                }));
         },
         events: {
             "click #goButton": "checkThisAndGo"
@@ -116,6 +126,10 @@
         el: "#main"
     });
 
+
+     $.getJSON("/isLoggedIn").done(function(response){
+         isLoggedIn = response.user
+
     var Router = Backbone.Router.extend({
         routes: {
             "homepage" : "homepage",
@@ -124,33 +138,48 @@
             "logout" : "logout"
         },
         register : function() {
-            var regModel = new RegistrationModel();
-            new registrationView({
-                model: regModel
-            });
+            if(!isLoggedIn) {
+                var regModel = new RegistrationModel();
+                new registrationView({
+                    model: regModel
+                });
+            } else {
+                router.homepage();
+            }
         },
         homepage : function() {
-            var homeModel = new HomePageModel();
-            new HomePageView({
-                model: homeModel
-            });
+            if (isLoggedIn) {
+                var homeModel = new HomePageModel();
+                new HomePageView({
+                    model: homeModel
+                });
+            } else {
+                router.login();
+            }
         },
         login : function() {
-            var loginModel = new LoginModel();
-            new loginView({
-                model: loginModel
-            });
+            if (!isLoggedIn) {
+                    var loginModel = new LoginModel();
+                    new loginView({
+                        model: loginModel
+                    });
+                } else {
+                    router.homepage();
+                }
         },
         logout : function() {
+            isLoggedIn = false;
             var logoutModel = new LogoutModel();
             new logoutView({
                 model: logoutModel
             });
         }
     });
-
     var router = new Router();
 
     Backbone.history.start();
+     });
+
+
 
 })();

@@ -24,18 +24,25 @@ app.use(session({
     saveUninitialized: true,
     secret: "XSM0018hubris765"
 }));
-app.use(function (req, res, next) {
-    if (req.session.usename === undefined) {
-        return res.json({
-
-        })
-    }
-    next();
-})
-
 
 app.get("/frank", function (req, res) {
     res.sendFile(__dirname + "/Static/index.html");
+});
+
+app.get("/isLoggedIn", function (req, res) {
+    // console.log(req.session.usename);
+    if (req.session.usename === undefined) {
+            console.log("no user");
+            res.json({
+                "user": false
+            })
+    } else {
+        console.log("yes user!");
+        res.json({
+            "user": true
+        })
+    }
+
 });
 
 function addUser(mail, user, password, res) {
@@ -91,7 +98,7 @@ app.post("/register", function(req, res) {
 });
 
 app.get("/homepage", function(req, res) {
-    console.log(req.body);
+    // console.log(req.body);
 });
 
 function checkThisPassOut(req, res, usename, plainPass) {
