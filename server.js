@@ -16,7 +16,7 @@ app.use(express.static(__dirname + "/Static"));
 app.use(bodyParser.json());
 app.use(session({
     store: new Store({
-        ttl: 3000,
+        ttl: 50000,
         host: 'localhost',
         port: 6379
     }),
@@ -30,13 +30,13 @@ app.get("/frank", function (req, res) {
 });
 
 app.get("/isLoggedIn", function (req, res) {
-    // console.log(req.session.usename);
+    console.log(req.session.usename);
     if (req.session.usename === undefined) {
             console.log("no user");
             res.json({
                 "user": false
             })
-    } else {
+    } else if (req.session.usename !== undefined){
         console.log("yes user!");
         res.json({
             "user": true
@@ -97,8 +97,8 @@ app.post("/register", function(req, res) {
     console.log(user);
 });
 
-app.get("/homepage", function(req, res) {
-    // console.log(req.body);
+app.post("/homepage", function(req, res) {
+    console.log(req.body);
 });
 
 function checkThisPassOut(req, res, usename, plainPass) {
@@ -126,15 +126,19 @@ function checkThisPassOut(req, res, usename, plainPass) {
                             error: "not habenning"
                         });
                     }
+                    req.session.usename = usename;
+                    // console.log(req.session.usename);
                     res.json("good to go");
-                    req.session.username = usename;
-                    console.log(req.session.usename);
                 })
             }
             comparePasses(plainPass, hashedPass.password, res);
         });
     });
 };
+
+app.get("/messages", function(req, res) {
+
+})
 
 app.post("/login", function(req, res) {
     var user = {

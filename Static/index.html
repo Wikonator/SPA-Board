@@ -19,6 +19,7 @@
             <!-- <script>  </script> -->
  </head>
 
+
  <body>
      <div id="main"> </div>
 
@@ -39,6 +40,13 @@
      <script id="homePage" type="text/handlebars">
         <h3> Ahoy!</h3>
         <p> Welcome to Frank a website for SWIM</p>
+        <div>
+            <form action="/message" id="message" method="post">
+            <textarea rows="4" cols="50" id="comment" form="message"></textarea>
+            <button type="button" id="sendMessage" name="postButt"> Troll </button>
+            </form>
+        </div>
+
         <div>
             <button type="button" id="logoutButton" name="logoutButton"> Logout </button>
         </div>

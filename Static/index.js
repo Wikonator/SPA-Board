@@ -50,12 +50,27 @@
              this.$el.html(Handlebars.templates.homePage())
          },
          events: {
-             "click #logoutButton": "goLogout"
+             "click #logoutButton": "goLogout",
+             "click #sendMessage": "sendMessage"
          },
          goLogout: function () {
              console.log("loggin out");
              window.location.hash = "logout";
          },
+         sendMessage: function() {
+             console.log("sending Message");
+             this.model.save({
+                "message": $("#comment").val()
+            },
+            {
+            error: function(err){
+                console.log(err);
+            },
+            success: function() {
+                console.log("succes posting!");
+            }
+        });
+    },
          el: "#main",
      });
 
@@ -94,7 +109,7 @@
             this.render();
         },
         render: function() {
-            console.log(window.location.search);
+            // console.log(window.location.search);
             if (window.location.search === "?notloggedin=true") {
             var displayWarning = true;
             } else {
@@ -111,6 +126,19 @@
             this.model.save({
                 "usename": $("#usename").val(),
                 "pass": $("#pass").val()
+            },
+            {
+                error: function(model, response) {
+                    console.log(response);
+            },
+                success: function(model, response) {
+                    console.log(response);
+                    $.getJSON("/isLoggedIn").done(function(resp){
+                        isLoggedIn = resp.user;
+                        console.log(isLoggedIn);
+                    window.location.hash = "homepage";
+                    });
+                }
             })
         },
         el: "#main"
@@ -126,10 +154,9 @@
         el: "#main"
     });
 
-
-     $.getJSON("/isLoggedIn").done(function(response){
-         isLoggedIn = response.user
-
+    $.getJSON("/isLoggedIn").done(function(response){
+        isLoggedIn = response.user
+        console.log(isLoggedIn);
     var Router = Backbone.Router.extend({
         routes: {
             "homepage" : "homepage",
@@ -138,33 +165,37 @@
             "logout" : "logout"
         },
         register : function() {
-            if(!isLoggedIn) {
+            if(isLoggedIn  == false) {
                 var regModel = new RegistrationModel();
                 new registrationView({
                     model: regModel
                 });
             } else {
-                router.homepage();
+                this.homepage();
             }
         },
         homepage : function() {
-            if (isLoggedIn) {
+            if (isLoggedIn == true) {
+                console.log("homepage - if");
                 var homeModel = new HomePageModel();
                 new HomePageView({
                     model: homeModel
                 });
             } else {
-                router.login();
+                console.log("homepage - else went");
+                this.login();
             }
         },
         login : function() {
-            if (!isLoggedIn) {
+            if (isLoggedIn == false) {
+                // console.log("login - false shot");
                     var loginModel = new LoginModel();
                     new loginView({
                         model: loginModel
                     });
                 } else {
-                    router.homepage();
+                    console.log("login - else shot");
+                    this.homepage();
                 }
         },
         logout : function() {
@@ -174,12 +205,12 @@
                 model: logoutModel
             });
         }
-    });
-    var router = new Router();
+      });
 
-    Backbone.history.start();
-     });
+      var router = new Router();
 
+          Backbone.history.start();
+   });
 
 
 })();
