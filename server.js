@@ -97,8 +97,32 @@ app.post("/register", function(req, res) {
     console.log(user);
 });
 
+function writeNewMessage(req, res, message, user) {
+    var client = new pg.Client("postgres://spiced:spiced1@localhost:5432/Frank");
+    client.connect(function(error) {
+        if (error) {
+            console.log("can't make it to pgsl, boss");
+            throw error;
+        }
+        var input = 'INSERT INTO messages (username, msg) VALUES ($1, $2);'
+        client.query(input, [user, message], function (error, results) {
+            if (error) {
+                console.log("query error");
+                console.log(error);
+                return res.json(error);
+            }
+            res.json("query complete");
+        })
+
+    });
+};
+
 app.post("/homepage", function(req, res) {
-    console.log(req.body);
+    var message = {
+        msg: req.body.message,
+        user: req.session.usename
+    };
+    writeNewMessage(req, res, message.msg, message.user);
 });
 
 function checkThisPassOut(req, res, usename, plainPass) {
