@@ -45,7 +45,7 @@ app.get("/isLoggedIn", function (req, res) {
 
 });
 
-function addUser(mail, user, password, res) {
+function addUser(mail, user, password, res, req) {
     var client = new pg.Client("postgres://spiced:spiced1@localhost:5432/Frank");
     client.connect(function (err) {
         if (err) {
@@ -71,7 +71,7 @@ function addUser(mail, user, password, res) {
 }
 
 
-function hashPass(user, res) {
+function hashPass(user, res, req) {
     crypt.genSalt(function(err,salt) {
         if (err) {
             return err;
@@ -82,7 +82,7 @@ function hashPass(user, res) {
                 return err;
             }
             console.log(hash);
-            addUser(user.email, user.name, hash, res);
+            addUser(user.email, user.name, hash, res, req);
         });
     });
 };
@@ -93,7 +93,7 @@ app.post("/register", function(req, res) {
         name: req.body.usename,
         pass: req.body.pass
     };
-    hashPass(user, res);
+    hashPass(user, res, req);
     console.log(user);
 });
 
@@ -160,8 +160,33 @@ function checkThisPassOut(req, res, usename, plainPass) {
     });
 };
 
-app.get("/messages", function(req, res) {
+function getMePosts(req, res, messageBoard) {
+    var client = new pg.Client("postgres://spiced:spiced1@localhost:5432/Frank");
+    client.connect(function(error) {
+        if (error) {
+            console.log("can't connect to base, boss");
+            throw error;
+        }
+        var input= 'SELECT * FROM messages;'
+        client.query(input, function(error, results){
+            if (error) {
+                console.log(error);
+                res.json("query failed")
+            }
+            var whatWeGot = results.rows[0];
+            client.end();
+            console.log(whatWeGot);
+        }
+    });
+}
 
+app.get("/messages", function(req, res) {
+    var messageBoard : {
+        user: ,
+        content:
+    };
+    getMePosts(req, res, messageBoard)
+    res.json(messageBoard);
 })
 
 app.post("/login", function(req, res) {

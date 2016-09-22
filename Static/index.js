@@ -19,7 +19,10 @@
 
     var HomePageModel = Backbone.Model.extend({
         initialize: function(){
-            console.log("yo i got intialized");
+            $.getJSON("/messages").done(function(resp){
+                var posts = resp;
+                console.log(posts);
+            });
         },
 
         url: "/homepage"
@@ -47,7 +50,10 @@
             //  console.log("ding dong");
          },
          render: function () {
-             this.$el.html(Handlebars.templates.homePage())
+
+             this.$el.html(Handlebars.templates.homePage({
+                 messageBoard :
+             }))
          },
          events: {
              "click #logoutButton": "goLogout",
@@ -68,6 +74,7 @@
             },
             success: function() {
                 console.log("succes posting!");
+                this.render();
             }
         });
     },
@@ -79,6 +86,7 @@
             this.render();
         },
         render: function() {
+
             this.$el.html(Handlebars.templates.falls());
         },
         events: {

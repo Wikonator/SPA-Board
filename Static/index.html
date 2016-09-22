@@ -46,7 +46,11 @@
             <button type="button" id="sendMessage" name="postButt"> Troll </button>
             </form>
         </div>
-
+        <div>
+            {{#messageBoard}}
+                <div><h4>{{User}}</h4><br><p>{{content}}</p><br></div>
+            {{/messageBoard}}
+        </div>
         <div>
             <button type="button" id="logoutButton" name="logoutButton"> Logout </button>
         </div>
