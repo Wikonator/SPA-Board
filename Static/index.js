@@ -19,13 +19,16 @@
 
     var HomePageModel = Backbone.Model.extend({
         initialize: function(){
+            var model = this;
             $.getJSON("/messages").done(function(resp){
                 var posts = resp;
-                console.log(posts);
+                model.set({
+                    messageBoard: posts
+                });
             });
         },
 
-        url: "/homepage"
+        url: "/messages"
     });
 
     var LoginModel = Backbone.Model.extend({
@@ -50,20 +53,29 @@
             //  console.log("ding dong");
          },
          render: function () {
+             var view = this;
+             this.model.fetch({
+                 success: function(model) {
+                     var messageBoard = model.toJSON();
+                     console.log(messageBoard);
+                     view.$el.html(Handlebars.templates.homePage(
+                         messageBoard
+                     ));
+                 }
+             });
 
-             this.$el.html(Handlebars.templates.homePage({
-                 messageBoard :
-             }))
          },
          events: {
              "click #logoutButton": "goLogout",
-             "click #sendMessage": "sendMessage"
+             "click #sendMessage": "sendMessage",
+             "click #freshButt": "refresh"
          },
          goLogout: function () {
              console.log("loggin out");
              window.location.hash = "logout";
          },
          sendMessage: function() {
+             var view = this;
              console.log("sending Message");
              this.model.save({
                 "message": $("#comment").val()
@@ -74,10 +86,15 @@
             },
             success: function() {
                 console.log("succes posting!");
-                this.render();
+                view.render();
             }
         });
     },
+        refresh: function() {
+            console.log("refreshing");
+            this.render();
+        },
+
          el: "#main",
      });
 
@@ -145,6 +162,7 @@
                         isLoggedIn = resp.user;
                         console.log(isLoggedIn);
                     window.location.hash = "homepage";
+                    this.render();
                     });
                 }
             })

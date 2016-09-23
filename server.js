@@ -117,7 +117,7 @@ function writeNewMessage(req, res, message, user) {
     });
 };
 
-app.post("/homepage", function(req, res) {
+app.post("/messages", function(req, res) {
     var message = {
         msg: req.body.message,
         user: req.session.usename
@@ -173,20 +173,22 @@ function getMePosts(req, res, messageBoard) {
                 console.log(error);
                 res.json("query failed")
             }
-            var whatWeGot = results.rows[0];
+            var whatWeGot = results.rows;
             client.end();
             console.log(whatWeGot);
-        }
+            res.json({
+                messages: whatWeGot
+            });
+        })
     });
 }
 
 app.get("/messages", function(req, res) {
-    var messageBoard : {
-        user: ,
-        content:
+    var messageBoard = {
+        user: "lol",
+        content: "kek"
     };
     getMePosts(req, res, messageBoard)
-    res.json(messageBoard);
 })
 
 app.post("/login", function(req, res) {
