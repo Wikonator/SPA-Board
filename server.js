@@ -10,9 +10,11 @@ var express = require("express"),
     session = require('express-session'),
     Store = require('connect-redis')(session),
     csurf = require("csurf"),
+    multer = require("multer"),
     pg = require("pg");
 
 app.use(express.static(__dirname + "/Static"));
+app.use(express.static(__dirname + "/uploads"));
 app.use(bodyParser.json());
 app.use(session({
     store: new Store({
@@ -43,6 +45,22 @@ app.get("/isLoggedIn", function (req, res) {
         })
     }
 
+});
+
+var diskStorage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, __dirname + '/uploads');
+    },
+    filename: function (req, file, callback) {
+      callback(null, req.session.usename + '_' + Date.now() + file.originalname);
+    }
+});
+
+var uploader = multer({
+    storage: diskStorage,
+    limits: {
+        filesize: 2097152
+    }
 });
 
 function addUser(mail, user, password, res, req) {
@@ -86,6 +104,19 @@ function hashPass(user, res, req) {
         });
     });
 };
+
+app.post('/upload', uploader.single('file'), function(req, res) {
+    if (req.file) {
+        res.json({
+            success: true,
+            file: '/uploads/' + req.file.filename
+        });
+    } else {
+        res.json({
+            success: false
+        });
+    }
+});
 
 app.post("/register", function(req, res) {
     var user = {

@@ -31,6 +31,12 @@
         url: "/messages"
     });
 
+    var UploadModel = Backbone.Model.extend({
+        initialize: function(){},
+
+        url: "/upload"
+    })
+
     var LoginModel = Backbone.Model.extend({
         initialize: function(){
 
@@ -97,6 +103,22 @@
 
          el: "#main",
      });
+
+     var UploadView = Backbone.View.extend({
+        initialize: function() {
+            this.render();
+        },
+        render: function () {
+            this.$el.html(Handlebars.templates.image());
+        },
+        events: {
+            "click #getThereButt" : "getInThere"
+        },
+        getInThere: function () {
+            console.log("someone touched my #butt");
+        }
+     });
+
 
     var registrationView = Backbone.View.extend({
         initialize: function() {
@@ -186,6 +208,7 @@
     var Router = Backbone.Router.extend({
         routes: {
             "homepage" : "homepage",
+            "upload" : "upload",
             "registration" : "register",
             "login" : "login",
             "logout" : "logout"
@@ -209,6 +232,19 @@
                 });
             } else {
                 console.log("homepage - else went");
+                this.login();
+            }
+        },
+        upload : function () {
+            if (isLoggedIn == true) {
+                console.log("upload if");
+                var uploadModel = new UploadModel();
+                new UploadView({
+                    model: uploadModel
+                });
+
+            } else {
+                console.log("upload else gone off");
                 this.login();
             }
         },
